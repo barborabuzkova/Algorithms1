@@ -1,0 +1,2 @@
+rm -f queues.zip
+zip queues.zip src/Deque.java src/RandomizedQueue.java src/Permutation.java
