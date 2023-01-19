@@ -1,6 +1,5 @@
 import edu.princeton.cs.algs4.StdRandom;
 
-import java.lang.reflect.Array;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
@@ -8,7 +7,7 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
 
     private Item[] s;
     private int end = 0;
-    private int size = 0;
+    private int size = 1;
 
     // construct an empty randomized queue
     public RandomizedQueue() {
@@ -22,7 +21,7 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
 
     // return the number of items on the randomized queue
     public int size() {
-        return size;
+        return end;
     }
 
     // add the item
@@ -55,7 +54,7 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
         if (isEmpty()) {
             throw new NoSuchElementException();
         }
-        return s[StdRandom.uniformInt(0, size - 1)];
+        return s[StdRandom.uniformInt(size)];
     }
 
     private class RQIterator implements Iterator<Item> {
@@ -77,7 +76,7 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
             if (!hasNext()) {
                 throw new NoSuchElementException();
             }
-            int location = StdRandom.uniformInt(0, size - 1);
+            int location = StdRandom.uniformInt(size);
             Item value = copy[location];
             copy[location] = copy[end--];
             i++;
