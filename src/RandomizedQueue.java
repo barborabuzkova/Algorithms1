@@ -6,12 +6,12 @@ import java.util.NoSuchElementException;
 public class RandomizedQueue<Item> implements Iterable<Item> {
 
     private Item[] s;
-    private int end = 0;
-    private int size = 1;
+    private int end = 0; // number of elements
+    private int size = 1; // size of array
 
     // construct an empty randomized queue
     public RandomizedQueue() {
-        s = (Item[]) new Object[1]; // capacity???
+        s = (Item[]) new Object[size]; // capacity???
     }
 
     // is the randomized queue empty?
@@ -29,11 +29,13 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
         if (item == null) {
             throw new IllegalArgumentException();
         }
-        if (end + 1 == size) {
-            s = (Item[]) new Object[size * 2];
+        if (end == size) {
+            Item[] temp = (Item[]) new Object[size * 2];
+            if (size >= 0) System.arraycopy(s, 0, temp, 0, size);
+            s = temp;
+            size = size * 2;
         }
         s[end++] = item;
-        size++;
     }
 
     // remove and return a random item
@@ -41,11 +43,10 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
         if (isEmpty()) {
             throw new NoSuchElementException();
         }
-        int location = StdRandom.uniformInt(0, size - 1);
+        int location = StdRandom.uniformInt(end);
         Item value = s[location];
-        s[location] = s[end];
+        s[location] = s[end - 1];
         end--;
-        size--;
         return value;
     }
 
@@ -54,33 +55,33 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
         if (isEmpty()) {
             throw new NoSuchElementException();
         }
-        return s[StdRandom.uniformInt(size)];
+        return s[StdRandom.uniformInt(end)];
     }
 
     private class RQIterator implements Iterator<Item> {
         int i = 0;
+        int copySize = size;
+        int copyEnd = end;
         Item[] copy;
 
         RQIterator() {
             copy = (Item[]) new Object[size];
-            for (int j = 0; j < size; j++) {
-                copy[j] = s[j];
-            }
+            if (copySize >= 0) System.arraycopy(s, 0, copy, 0, copySize);
         }
 
         public boolean hasNext() {
-            return i < end;
+            return 0 < copyEnd;
         }
 
         public Item next() {
             if (!hasNext()) {
                 throw new NoSuchElementException();
             }
-            int location = StdRandom.uniformInt(size);
+            int location = StdRandom.uniformInt(copySize);
             Item value = copy[location];
-            copy[location] = copy[end--];
+            copy[location] = copy[copyEnd - 1];
+            copyEnd--;
             i++;
-            size--;
             return value;
         }
 
@@ -96,7 +97,13 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
 
     // unit testing (required)
     public static void main(String[] args) {
-
+        RandomizedQueue<Integer> queue = new RandomizedQueue<>();
+        assert 0 == queue.size();
+        queue.enqueue(290);
+        assert 290 == queue.sample();
+        assert 290 == queue.sample();
+        queue.enqueue(484);
+        assert 2 == queue.size();
+        System.out.print(queue.dequeue());
     }
-
 }
