@@ -30,10 +30,10 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
             throw new IllegalArgumentException();
         }
         if (end == size) {
-            Item[] temp = (Item[]) new Object[size * 2];
-            if (size >= 0) System.arraycopy(s, 0, temp, 0, size);
-            s = temp;
             size = size * 2;
+            Item[] temp = (Item[]) new Object[size];
+            System.arraycopy(s, 0, temp, 0, end);
+            s = temp;
         }
         s[end++] = item;
     }
@@ -46,7 +46,14 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
         int location = StdRandom.uniformInt(end);
         Item value = s[location];
         s[location] = s[end - 1];
+        s[end-1] = null;
         end--;
+        if (end <= size/2 && end != 0) {
+            Item[] temp = (Item[]) new Object[end];
+            System.arraycopy(s, 0, temp, 0, end);
+            s = temp;
+            size = end;
+        }
         return value;
     }
 
@@ -59,14 +66,15 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
     }
 
     private class RQIterator implements Iterator<Item> {
-        int i = 0;
-        int copySize = size;
-        int copyEnd = end;
+        final int copySize;
+        int copyEnd;
         Item[] copy;
 
         RQIterator() {
-            copy = (Item[]) new Object[size];
-            if (copySize >= 0) System.arraycopy(s, 0, copy, 0, copySize);
+            copySize = size;
+            copyEnd = end;
+            copy = (Item[]) new Object[copyEnd];
+            System.arraycopy(s, 0, copy, 0, copyEnd);
         }
 
         public boolean hasNext() {
@@ -77,11 +85,11 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
             if (!hasNext()) {
                 throw new NoSuchElementException();
             }
-            int location = StdRandom.uniformInt(copySize);
+            int location = StdRandom.uniformInt(copyEnd);
             Item value = copy[location];
             copy[location] = copy[copyEnd - 1];
+            copy[copyEnd - 1] = null;
             copyEnd--;
-            i++;
             return value;
         }
 

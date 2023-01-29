@@ -65,10 +65,10 @@ public class Deque<Item> implements Iterable<Item> {
         }
         Item item = first.item;
         first = first.next;
-        if (isEmpty()) {
+        size--;
+        if (size == 0) {
             last = null;
         }
-        size--;
         return item;
     }
 
