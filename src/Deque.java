@@ -9,6 +9,7 @@ public class Deque<Item> implements Iterable<Item> {
     private class Node {
         Item item;
         Node next;
+        Node previous;
     }
 
     // construct an empty deque
@@ -35,10 +36,13 @@ public class Deque<Item> implements Iterable<Item> {
         first = new Node();
         first.item = item;
         first.next = oldFirst;
-        if (isEmpty()) {
-            last = first;
-        }
+        first.previous = null;
         size++;
+        if (size == 1) {
+            last = first;
+        } else {
+            oldFirst.previous = first;
+        }
     }
 
     // add the item to the back
@@ -50,12 +54,13 @@ public class Deque<Item> implements Iterable<Item> {
         last = new Node();
         last.item = item;
         last.next = null;
-        if (isEmpty()) {
+        last.previous = oldLast;
+        size++;
+        if (size == 1) {
             first = last;
         } else {
             oldLast.next = last;
         }
-        size++;
     }
 
     // remove and return the item from the front
@@ -68,6 +73,8 @@ public class Deque<Item> implements Iterable<Item> {
         size--;
         if (size == 0) {
             last = null;
+        } else {
+            first.previous = null;
         }
         return item;
     }
@@ -77,22 +84,26 @@ public class Deque<Item> implements Iterable<Item> {
         if (isEmpty()) {
             throw new NoSuchElementException();
         }
-        Node item = first;
-        Node previous = null;
-        while (item.next != null) {
-            previous = item;
-            item = item.next;
-        }
-        Item result = item.item;
-        last = previous;
-        if (last != null) {
+        Item item = last.item;
+        last = last.previous;
+//        Node item = first;
+//        Node previous = null;
+//        while (item.next != null) {
+//            previous = item;
+//            item = item.next;
+//        }
+//        Item result = item.item;
+//        last = previous;
+//        if (last != null) {
+//            last.next = null;
+//        }
+        size--;
+        if (size == 0) {
+            first = null;
+        } else {
             last.next = null;
         }
-        size--;
-        if (isEmpty()) {
-            first = null;
-        }
-        return result;
+        return item;
     }
 
     // return an iterator over items in order from front to back
